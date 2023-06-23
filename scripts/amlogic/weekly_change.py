@@ -29,9 +29,7 @@ def exec_cmd_rdata(cmd):
     return res
 
 def is_sh_platform_commit(auther):
-	if auther in PLAFORM_SH_MEMBERS:
-		return True
-	return False
+	return auther in PLAFORM_SH_MEMBERS
 
 def main():
 	start_date = ""
@@ -43,22 +41,22 @@ def main():
 	highlight_shp = False
 	opts, args = getopt.getopt(sys.argv[1:], "hps:e:")
 	for op, value in opts:
-		if op == "-s":
-			start_date = value
 		if op == "-e":
 			end_date = value
-		if op == "-p":
+		elif op == "-p":
 			highlight_shp = True
+		elif op == "-s":
+			start_date = value
 		if op == "-h":
 			usage()
 			sys.exit()
 
 	#print(start_date)
-	git_commit_cmd = git_commit_cmd+start_date
+	git_commit_cmd += start_date
 	if end_date == "":
-		git_commit_cmd = git_commit_cmd + " --no-merges"
+		git_commit_cmd = f"{git_commit_cmd} --no-merges"
 	else:
-		git_commit_cmd = git_commit_cmd + " --until=" + end_date + " --no-merges"
+		git_commit_cmd = f"{git_commit_cmd} --until={end_date} --no-merges"
 	#print(git_commit_cmd)
 	git_commit_info = exec_cmd_rdata(git_commit_cmd)
 	#print(git_commit_info)
@@ -86,15 +84,12 @@ def main():
 		html_out = html_out + '<a title=\"' + gerrit_url + \
 			   '\"ass=\" external\" rel=\"external nofollow\" href=\"' + gerrit_url + '\" target=\"_blank\">' + \
 			   commit + '</a> - ' + message
-		if highlight_shp == True:
-			if is_sh_platform_commit(owner_name) == True:
-				html_out += ' (SH_PLATFORM_KERNEL)<br>'
-			else:
-				html_out += '<br>'
+		if highlight_shp == True and is_sh_platform_commit(owner_name) == True:
+			html_out += ' (SH_PLATFORM_KERNEL)<br>'
 		else:
 			html_out += '<br>'
-		#print(html_out)
-	html_out = html_out + '</div>'
+			#print(html_out)
+	html_out = f'{html_out}</div>'
 	#print(html_out)
 
 	html = open("weekly_update.html", "w+")
